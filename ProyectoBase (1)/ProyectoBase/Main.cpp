@@ -4,31 +4,43 @@
 #include <iostream>
 #include <vector>
 #include <thread>
-
+#include <mutex>
 #define MAX_MENSAJES 30
-/*
+std::mutex mu;
+
 class MyFunctor
 {
+private:
+	sf::TcpSocket*socket;
+	std::vector<std::string>*aMensajes;
 public:
-void Reception(sf::TcpSocket*socket, std::vector<std::string>*aMensajes){
-char buffer[100];
-size_t bytesReceived;
-//sf::Socket::Status status = socket.receive;
-int a = 1;
-while (a != 0) {
-socket->receive(buffer, 100, bytesReceived);
-aMensajes->push_back(buffer);
-if (aMensajes->size() > 25)
-{
-aMensajes->erase(aMensajes->begin(), aMensajes->begin() + 1);
-}
-}
-}
+	MyFunctor(sf::TcpSocket*socket, std::vector<std::string>*aMensajes) {
+		this->socket = socket;
+		this->aMensajes = aMensajes;
+	}
+	void operator()() {
+		char buffer[100];
+		size_t bytesReceived;
+		//sf::Socket::Status status = socket.receive;
+		int a = 1;
+		while (a != 0) {
+			socket->receive(buffer, 100, bytesReceived);
+			mu.lock();
+			aMensajes->push_back(buffer);
+			mu.unlock();
+			if (aMensajes->size() > 25)
+			{
+				aMensajes->erase(aMensajes->begin(), aMensajes->begin() + 1);
+			}
+			//buffer[bytesReceived] = '\0';
+		}
+	}
 
-};*/
 
+};
+/*
 void Reception(sf::TcpSocket*socket, std::vector<std::string>*aMensajes) {
-	/*char buffer[100];
+	char buffer[100];
 	size_t bytesReceived;
 	//sf::Socket::Status status = socket.receive;
 	int a = 1;
@@ -39,8 +51,8 @@ void Reception(sf::TcpSocket*socket, std::vector<std::string>*aMensajes) {
 		{
 			aMensajes->erase(aMensajes->begin(), aMensajes->begin() + 1);
 		}
-	}*/
-}
+	}
+}*/
 
 int main()
 {
@@ -71,6 +83,10 @@ int main()
 	std::cout << texto;
 
 	std::vector<std::string> aMensajes;
+
+	//RECEIVE
+	MyFunctor fnctor(&socket, &aMensajes);
+	std::thread t(fnctor);
 
 	sf::Vector2i screenDimensions(800, 600);
 
@@ -133,7 +149,6 @@ int main()
 			}
 		}
 		//RECEIVE -- thread
-		std::thread t(Reception, &socket, &aMensajes);
 		//fnctor.Reception(&socket, &aMensajes);
 
 		window.draw(separator);
