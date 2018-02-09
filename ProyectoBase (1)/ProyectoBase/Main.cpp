@@ -19,20 +19,19 @@ public:
 		this->aMensajes = aMensajes;
 	}
 	void operator()() {
-		char buffer[100];
-		size_t bytesReceived;
-		//sf::Socket::Status status = socket.receive;
-		int a = 1;
-		while (a != 0) {
-			socket->receive(buffer, 100, bytesReceived);
-			mu.lock();
-			aMensajes->push_back(buffer);
-			mu.unlock();
-			if (aMensajes->size() > 25)
-			{
-				aMensajes->erase(aMensajes->begin(), aMensajes->begin() + 1);
+		while (true) {
+			char buffer[2000];
+			size_t bytesReceived;
+			
+			sf::Socket::Status status = socket->receive(buffer, 2000, bytesReceived);
+			if (status == sf::Socket::Status::Disconnected) {
+				break;
 			}
-			//buffer[bytesReceived] = '\0';
+			buffer[bytesReceived] = '\0';
+			mu.lock();
+			this->aMensajes->push_back(buffer);
+			mu.unlock();
+			
 		}
 	}
 
@@ -136,8 +135,14 @@ int main()
 						aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
 					}
 					//SEND
-					socket.send(mensaje.c_str(), mensaje.length());
+					std::cout << mensaje << "\n";
+					sf::Socket::Status status = socket.send(mensaje.c_str(), mensaje.length());
+					
+					if (status != sf::Socket::Status::Done) {
+						std::cout << "ERROR";
+					}
 					mensaje = ">";
+					
 				}
 				break;
 			case sf::Event::TextEntered:
@@ -167,7 +172,7 @@ int main()
 		window.display();
 		window.clear();
 	}
-
+	socket.disconnect();
 }
 /*
 int main()
