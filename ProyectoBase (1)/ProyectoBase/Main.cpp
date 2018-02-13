@@ -8,6 +8,9 @@
 #define MAX_MENSAJES 30
 std::mutex mu;
 
+// Blocking and thread
+#if true
+
 class MyFunctor
 {
 private:
@@ -136,12 +139,12 @@ int main()
 					//SEND
 					std::cout << mensaje << "\n";
 					sf::Socket::Status status = socket.send(mensaje.c_str(), mensaje.length());
-					
+
 					if (status != sf::Socket::Status::Done) {
 						std::cout << "ERROR";
 					}
 					mensaje = ">";
-					
+
 				}
 				break;
 			case sf::Event::TextEntered:
@@ -173,6 +176,8 @@ int main()
 	}
 	socket.disconnect();
 }
+#endif
+
 /*
 int main()
 {
