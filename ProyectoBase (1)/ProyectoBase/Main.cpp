@@ -136,14 +136,30 @@ int main()
 					{
 						aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
 					}
-					//SEND
-					std::cout << mensaje << "\n";
-					sf::Socket::Status status = socket.send(mensaje.c_str(), mensaje.length());
-
-					if (status != sf::Socket::Status::Done) {
-						std::cout << "ERROR";
+					if (mensaje == ">exit" || mensaje == "exit")
+					{
+						mensaje = "Chat finalizado";
+						std::cout << mensaje << "\n";
+						sf::Socket::Status status = socket.send(mensaje.c_str(), mensaje.length());
+						if (status != sf::Socket::Status::Done) {
+							std::cout << "ERROR";
+						}
+						mensaje = ">";
+						window.display();
+						window.clear();
+						window.close();
+						socket.disconnect();
 					}
-					mensaje = ">";
+					else {
+						//SEND
+						std::cout << mensaje << "\n";
+						sf::Socket::Status status = socket.send(mensaje.c_str(), mensaje.length());
+						if (status != sf::Socket::Status::Done) {
+							std::cout << "ERROR";
+						}
+						mensaje = ">";
+					}
+					
 
 				}
 				break;
@@ -217,11 +233,11 @@ int main()
 	char c;
 	std::cin >> c;
 	sf::TcpSocket socket;
+	socket.setBlocking(false);
 	std::string textoAEnviar = "";
 	if (c == 's')
 	{
 		sf::TcpListener listener;
-		listener.setBlocking(false);
 		listener.listen(50000);
 		listener.accept(socket);
 		textoAEnviar = "Mensaje desde servidor\n";
@@ -293,15 +309,35 @@ int main()
 					{
 						aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
 					}
-					//SEND
-					std::cout << mensaje << "\n";
-					sf::Socket::Status statusSend = socket.send(mensaje.c_str(), mensaje.length());
-
-					if (statusSend != sf::Socket::Done) {
-						std::cout << "Partial Data";
+					if (mensaje == ">exit" || mensaje == "exit")
+					{
+						std::size_t bs;
+						mensaje = "Chat finalizado";
+						std::cout << mensaje << "\n";
+						sf::Socket::Status statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+						while (statusSend == sf::Socket::Status::Partial)
+						{
+							mensaje = mensaje.substr(bs + 1, bs);
+							statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+						}
+						mensaje = ">";
+						window.display();
+						window.clear();
+						window.close();
+						socket.disconnect();
 					}
-					mensaje = ">";
-
+					
+					else {//SEND
+						std::size_t bs;
+						std::cout << mensaje << "\n";
+						sf::Socket::Status statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+						while (statusSend == sf::Socket::Status::Partial)
+						{
+							mensaje = mensaje.substr(bs + 1, bs);
+							statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+						}
+						mensaje = ">";
+					}
 				}
 				break;
 			case sf::Event::TextEntered:
@@ -311,10 +347,12 @@ int main()
 					mensaje.erase(mensaje.length() - 1, mensaje.length());
 				break;
 			}
+
 		}
 		//RECEIVE -- thread
 		//fnctor.Reception(&socket, &aMensajes);
 		while (true) {
+
 			char buffer[2000];
 			size_t bytesReceived;
 
