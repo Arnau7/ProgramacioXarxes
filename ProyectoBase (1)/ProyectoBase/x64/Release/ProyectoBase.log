@@ -1,9 +1,16 @@
 ﻿  Main.cpp
-Main.cpp(247): warning C4244: 'argumento': conversión de 'float' a 'sf::Int32'; posible pérdida de datos
-Main.cpp(376): warning C4244: 'argumento': conversión de '::size_t' a 'float'; posible pérdida de datos
-  Generando código
-  6 of 225 functions ( 2.7%) were compiled, the rest were copied from previous compilation.
-    4 functions were new in current compilation
-    23 functions had inline decision re-evaluated but remain unchanged
-  Generación de código finalizada
-  ProyectoBase.vcxproj -> D:\Arnau\ENTI\3r\Programació de jocs en xarxa\ProgramacioXarxes\ProyectoBase (1)\x64\Release\ProyectoBase.exe
+Main.cpp(72): warning C4244: 'argument': conversion from 'float' to 'sf::Int32', possible loss of data
+Main.cpp(178): warning C4244: 'argument': conversion from '::size_t' to 'float', possible loss of data
+Main.cpp(210): warning C4244: 'argument': conversion from 'float' to 'sf::Int32', possible loss of data
+Main.cpp(339): warning C4244: 'argument': conversion from '::size_t' to 'float', possible loss of data
+Main.cpp(374): warning C4244: 'argument': conversion from 'float' to 'sf::Int32', possible loss of data
+Main.cpp(507): warning C4244: 'argument': conversion from '::size_t' to 'float', possible loss of data
+  Generating code
+c:\users\aruiz\documents\github\programacioxarxes\proyectobase (1)\proyectobase\main.cpp(191): warning C4715: 'BlockingThreading': not all control paths return a value
+c:\users\aruiz\documents\github\programacioxarxes\proyectobase (1)\proyectobase\main.cpp(352): warning C4715: 'NonBlocking': not all control paths return a value
+c:\users\aruiz\documents\github\programacioxarxes\proyectobase (1)\proyectobase\main.cpp(520): warning C4715: 'SocketSelector': not all control paths return a value
+  63 of 350 functions (18.0%) were compiled, the rest were copied from previous compilation.
+    61 functions were new in current compilation
+    49 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  ProyectoBase.vcxproj -> C:\Users\aruiz\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Release\ProyectoBase.exe
