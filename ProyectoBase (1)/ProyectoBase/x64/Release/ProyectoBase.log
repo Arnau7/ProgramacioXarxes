@@ -1,14 +1,9 @@
-﻿  Main.cpp
-Main.cpp(218): warning C4244: 'argumento': conversión de '::size_t' a 'float'; posible pérdida de datos
-Main.cpp(377): warning C4244: 'argumento': conversión de '::size_t' a 'float'; posible pérdida de datos
-Main.cpp(526): warning C4244: 'argumento': conversión de '::size_t' a 'float'; posible pérdida de datos
-Main.cpp(583): warning C4244: 'argumento': conversión de 'float' a 'sf::Int32'; posible pérdida de datos
-  Generando código
-c:\users\miquel\documents\github\programacioxarxes\proyectobase (1)\proyectobase\main.cpp(231): warning C4715: 'BlockingThreading': no todas las rutas de acceso de control devuelven un valor
-c:\users\miquel\documents\github\programacioxarxes\proyectobase (1)\proyectobase\main.cpp(539): warning C4715: 'SocketSelector': no todas las rutas de acceso de control devuelven un valor
-c:\users\miquel\documents\github\programacioxarxes\proyectobase (1)\proyectobase\main.cpp(390): warning C4715: 'NonBlocking': no todas las rutas de acceso de control devuelven un valor
-  9 of 439 functions ( 2.1%) were compiled, the rest were copied from previous compilation.
+﻿  Generating code
+c:\users\mripoll\documents\github\programacioxarxes\proyectobase (1)\proyectobase\main.cpp(202): warning C4715: 'BlockingThreading': not all control paths return a value
+c:\users\mripoll\documents\github\programacioxarxes\proyectobase (1)\proyectobase\main.cpp(462): warning C4715: 'SocketSelector': not all control paths return a value
+c:\users\mripoll\documents\github\programacioxarxes\proyectobase (1)\proyectobase\main.cpp(340): warning C4715: 'NonBlocking': not all control paths return a value
+  6 of 440 functions ( 1.4%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    19 functions had inline decision re-evaluated but remain unchanged
-  Generación de código finalizada
-  ProyectoBase.vcxproj -> C:\Users\Miquel\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Release\ProyectoBase.exe
+    3 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  ProyectoBase.vcxproj -> C:\Users\mripoll\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Release\ProyectoBase.exe

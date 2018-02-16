@@ -8,7 +8,6 @@
 #define MAX_MENSAJES 30
 std::mutex mu;
 
-
 class MyFunctor
 {
 private:
@@ -53,13 +52,13 @@ public:
 	}
 	void operator()() {
 		while (true) {
-			while (ss->wait()) {
-				std::cout << "Tenc una petició\n";
+			if (ss->wait()) {
+				//std::cout << "Tenc una peticio\n";
 				for (int i = 0; i < aSocket.size(); i++)
 				{
 					if (ss->isReady(*aSocket[i]))
 					{
-						std::cout << "He trobat el socket, es el " << i << "\n";
+						//std::cout << "He trobat el socket, es el " << i << "\n";
 						char buffer[2000];
 						size_t bytesReceived;
 
@@ -85,37 +84,10 @@ public:
 
 };
 
-
 int BlockingThreading(sf::TcpSocket* socket) 
 {
-	//ESTABLECER CONEXIÓN
-	/*std::cout << "¿Seras servidor (s) o cliente (c)? ... ";
-	char c;
-	std::cin >> c;
-	sf::TcpSocket socket;
-	std::string textoAEnviar = "";
-	if (c == 's')
-	{
-		sf::TcpListener listener;
-		listener.listen(50000);
-		listener.accept(socket);
-		textoAEnviar = "Mensaje desde servidor\n";
-		socket.send(mode.c_str(), mode.length());
-	}
-	else if (c == 'c')
-	{
-		socket.connect("localhost", 50000, sf::milliseconds(15.f));
-		textoAEnviar = "Mensaje desde cliente\n";
-		char modeBuffer[4];
-		size_t bytesReceived;
-		socket.receive(modeBuffer, 4, bytesReceived);
-		modeBuffer[bytesReceived] = '\n';
-		std::cout << modeBuffer;
-	}
-	else
-	{
-		exit(0);
-	}*/
+	std::cout << "Blocking chat \n";
+
 	std::string texto = "Conexion con ... " + (socket->getRemoteAddress()).toString() + ":" + std::to_string(socket->getRemotePort()) + "\n";
 	std::cout << texto;
 
@@ -231,29 +203,8 @@ int BlockingThreading(sf::TcpSocket* socket)
 
 int NonBlocking(sf::TcpSocket* socket) 
 {
-	/*std::cout << "¿Seras servidor (s) o cliente (c)? ... ";
-	char c;
-	std::cin >> c;
-	sf::TcpSocket socket;
-	socket.setBlocking(false);
-	std::string textoAEnviar = "";
-	if (c == 's')
-	{
-		sf::TcpListener listener;
-		listener.listen(50000);
-		listener.accept(socket);
-		textoAEnviar = "Mensaje desde servidor\n";
-	}
-	else if (c == 'c')
-	{
-		socket.connect("localhost", 50000, sf::milliseconds(15.f));
-		textoAEnviar = "Mensaje desde cliente\n";
-
-	}
-	else
-	{
-		exit(0);
-	}*/
+	
+	std::cout << "NonBlocking chat \n";
 
 	socket->setBlocking(false);
 
@@ -388,35 +339,12 @@ int NonBlocking(sf::TcpSocket* socket)
 	socket->disconnect();
 }
 
-int SocketSelector(sf::TcpSocket* socket, sf::SocketSelector* ss) 
+int SocketSelector(sf::TcpSocket* socket) 
 {
-	/*std::cout << "¿Seras servidor (s) o cliente (c)? ... ";
-	char c;
-	std::cin >> c;
-	sf::TcpSocket socket;
-	std::string textoAEnviar = "";
+	std::cout << "Socket selector chat\n";
+
 	sf::SocketSelector ss;
-	std::vector<sf::TcpSocket*> aSocket;
-	if (c == 's')
-	{
-		sf::TcpListener listener;
-		listener.listen(50000);
-		listener.accept(socket);
-		ss.add(socket);
-		aSocket.push_back(&socket);
-		textoAEnviar = "Mensaje desde servidor\n";
-	}
-	else if (c == 'c')
-	{
-		socket.connect("localhost", 50000, sf::milliseconds(15.f));
-		textoAEnviar = "Mensaje desde cliente\n";
-
-	}
-	else
-	{
-		exit(0);
-	}*/
-
+	ss.add(*socket);
 	
 	std::vector<sf::TcpSocket*> aSocket;
 	aSocket.push_back(socket);
@@ -427,11 +355,7 @@ int SocketSelector(sf::TcpSocket* socket, sf::SocketSelector* ss)
 
 	std::vector<std::string> aMensajes;
 
-	//RECEIVE
-	//MyFunctor fnctor(socket, &aMensajes);
-	//std::thread t(fnctor);
-	//std::vector<std::string>*aMensajes, sf::SocketSelector* ss, std::vector<sf::TcpSocket*> aSocket
-	MyFunctorSS ss_functor(&aMensajes, ss, aSocket);
+	MyFunctorSS ss_functor(&aMensajes, &ss, aSocket);
 	std::thread t(ss_functor);
 
 	sf::Vector2i screenDimensions(800, 600);
@@ -547,21 +471,17 @@ int main()
 	std::string textoAEnviar = "";
 
 	char modeBuffer[1];
-	sf::SocketSelector ss;
-	ss.add(socket);
 	// Hola
 	if (c == 's')
 	{
-		std::cout << "Elige Modo (1) Blocking & Threading, (2) Nonblocking, (3) SocketSelector:\n";
+		std::cout << "_____ Elige un modo _____ \n" << "1- Blocking & Threading \n" << "2- NonBlocking \n" << "3- SocketSelector\n";
 		std::string mode;
 		std::cin >> mode;
 
 		sf::TcpListener listener;
 		listener.listen(50000);
 		listener.accept(socket);
-		textoAEnviar = "Mensaje desde servidor\n";
 		socket.send(mode.c_str(), mode.length());
-
 
 		if (mode == "1") {
 			BlockingThreading(&socket);
@@ -570,7 +490,7 @@ int main()
 			NonBlocking(&socket);
 		}
 		else if (mode == "3") {
-			SocketSelector(&socket, &ss);
+			SocketSelector(&socket);
 		}
 		else
 		{
@@ -580,13 +500,11 @@ int main()
 	else if (c == 'c')
 	{
 		socket.connect("localhost", 50000, sf::milliseconds(15.f));
-		textoAEnviar = "Mensaje desde cliente\n";
 
 		// Rebre el mode seleccionat per el servidor
 		size_t bytesReceived;
 		socket.receive(modeBuffer, 1, bytesReceived);
-		//modeBuffer[bytesReceived] = '\n';
-		std::cout << modeBuffer;
+		//std::cout << modeBuffer;
 
 		if (modeBuffer[0] == '1') {
 			BlockingThreading(&socket);
@@ -595,7 +513,7 @@ int main()
 			NonBlocking(&socket);
 		}
 		else if (modeBuffer[0] == '3') {
-			SocketSelector(&socket, &ss);
+			SocketSelector(&socket);
 		}
 	}
 	else
