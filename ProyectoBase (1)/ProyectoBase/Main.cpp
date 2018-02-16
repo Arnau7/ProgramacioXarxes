@@ -37,25 +37,59 @@ public:
 	}
 
 };
-/*
-void Reception(sf::TcpSocket*socket, std::vector<std::string>*aMensajes) {
-	char buffer[100];
-	size_t bytesReceived;
-	//sf::Socket::Status status = socket.receive;
-	int a = 1;
-	while (a != 0) {
-		socket->receive(buffer, 100, bytesReceived);
-		aMensajes->push_back(buffer);
-		if (aMensajes->size() > 25)
-		{
-			aMensajes->erase(aMensajes->begin(), aMensajes->begin() + 1);
+
+class MyFunctorSS
+{
+private:
+	sf::SocketSelector* ss;
+	std::vector<std::string>*aMensajes;
+	std::vector<sf::TcpSocket*>aSocket;
+
+public:
+	MyFunctorSS(std::vector<std::string>*aMensajes, sf::SocketSelector* ss, std::vector<sf::TcpSocket*> aSocket) {
+		this->ss = ss;
+		this->aMensajes = aMensajes;
+		this->aSocket = aSocket;
+	}
+	void operator()() {
+		while (true) {
+			while (ss->wait()) {
+				std::cout << "Tenc una petició\n";
+				for (int i = 0; i < aSocket.size(); i++)
+				{
+					if (ss->isReady(*aSocket[i]))
+					{
+						std::cout << "He trobat el socket, es el " << i << "\n";
+						char buffer[2000];
+						size_t bytesReceived;
+
+						sf::Socket::Status statusReceive = aSocket[i]->receive(buffer, 2000, bytesReceived);
+						if (statusReceive == sf::Socket::NotReady) {
+							break;
+						}
+						else if (statusReceive == sf::Socket::Done) {
+							buffer[bytesReceived] = '\0';
+							aMensajes->push_back(buffer);
+						}
+						else if (statusReceive == sf::Socket::Disconnected) {
+							break;
+						}
+						break;
+					}
+
+				}
+
+			}
 		}
 	}
-}*/
-int BlockingThreading() 
+
+};
+
+
+int BlockingThreading(sf::TcpSocket* socket) 
 {
 	//ESTABLECER CONEXIÓN
-	std::cout << "¿Seras servidor (s) o cliente (c)? ... ";
+	/*std::cout << "¿Seras servidor (s) o cliente (c)? ... ";
 	char c;
 	std::cin >> c;
 	sf::TcpSocket socket;
@@ -66,24 +100,29 @@ int BlockingThreading()
 		listener.listen(50000);
 		listener.accept(socket);
 		textoAEnviar = "Mensaje desde servidor\n";
+		socket.send(mode.c_str(), mode.length());
 	}
 	else if (c == 'c')
 	{
 		socket.connect("localhost", 50000, sf::milliseconds(15.f));
 		textoAEnviar = "Mensaje desde cliente\n";
-
+		char modeBuffer[4];
+		size_t bytesReceived;
+		socket.receive(modeBuffer, 4, bytesReceived);
+		modeBuffer[bytesReceived] = '\n';
+		std::cout << modeBuffer;
 	}
 	else
 	{
 		exit(0);
-	}
-	std::string texto = "Conexion con ... " + (socket.getRemoteAddress()).toString() + ":" + std::to_string(socket.getRemotePort()) + "\n";
+	}*/
+	std::string texto = "Conexion con ... " + (socket->getRemoteAddress()).toString() + ":" + std::to_string(socket->getRemotePort()) + "\n";
 	std::cout << texto;
 
 	std::vector<std::string> aMensajes;
 
 	//RECEIVE
-	MyFunctor fnctor(&socket, &aMensajes);
+	MyFunctor fnctor(socket, &aMensajes);
 	std::thread t(fnctor);
 
 	sf::Vector2i screenDimensions(800, 600);
@@ -137,7 +176,7 @@ int BlockingThreading()
 					{
 						mensaje = "Chat finalizado";
 						std::cout << mensaje << "\n";
-						sf::Socket::Status status = socket.send(mensaje.c_str(), mensaje.length());
+						sf::Socket::Status status = socket->send(mensaje.c_str(), mensaje.length());
 						if (status != sf::Socket::Status::Done) {
 							std::cout << "ERROR";
 						}
@@ -145,12 +184,12 @@ int BlockingThreading()
 						window.display();
 						window.clear();
 						window.close();
-						socket.disconnect();
+						socket->disconnect();
 					}
 					else {
 						//SEND
 						std::cout << mensaje << "\n";
-						sf::Socket::Status status = socket.send(mensaje.c_str(), mensaje.length());
+						sf::Socket::Status status = socket->send(mensaje.c_str(), mensaje.length());
 						if (status != sf::Socket::Status::Done) {
 							std::cout << "ERROR";
 						}
@@ -187,12 +226,12 @@ int BlockingThreading()
 		window.display();
 		window.clear();
 	}
-	socket.disconnect();
+	socket->disconnect();
 }
 
-int NonBlocking() 
+int NonBlocking(sf::TcpSocket* socket) 
 {
-	std::cout << "¿Seras servidor (s) o cliente (c)? ... ";
+	/*std::cout << "¿Seras servidor (s) o cliente (c)? ... ";
 	char c;
 	std::cin >> c;
 	sf::TcpSocket socket;
@@ -214,17 +253,15 @@ int NonBlocking()
 	else
 	{
 		exit(0);
-	}
-	std::string texto = "Conexion con ... " + (socket.getRemoteAddress()).toString() + ":" + std::to_string(socket.getRemotePort()) + "\n";
+	}*/
+
+	socket->setBlocking(false);
+
+	std::string texto = "Conexion con ... " + (socket->getRemoteAddress()).toString() + ":" + std::to_string(socket->getRemotePort()) + "\n";
 	std::cout << texto;
 
 	std::vector<std::string> aMensajes;
-
-	//RECEIVE
-	//MyFunctor fnctor(&socket, &aMensajes);
-	//std::thread t(fnctor);
-
-
+	
 	sf::Vector2i screenDimensions(800, 600);
 
 	sf::RenderWindow window;
@@ -277,27 +314,27 @@ int NonBlocking()
 						std::size_t bs;
 						mensaje = "Chat finalizado";
 						std::cout << mensaje << "\n";
-						sf::Socket::Status statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+						sf::Socket::Status statusSend = socket->send(mensaje.c_str(), mensaje.length(), bs);
 						while (statusSend == sf::Socket::Status::Partial)
 						{
 							mensaje = mensaje.substr(bs + 1, bs);
-							statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+							statusSend = socket->send(mensaje.c_str(), mensaje.length(), bs);
 						}
 						mensaje = ">";
 						window.display();
 						window.clear();
 						window.close();
-						socket.disconnect();
+						socket->disconnect();
 					}
 
 					else {//SEND
 						std::size_t bs;
 						std::cout << mensaje << "\n";
-						sf::Socket::Status statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+						sf::Socket::Status statusSend = socket->send(mensaje.c_str(), mensaje.length(), bs);
 						while (statusSend == sf::Socket::Status::Partial)
 						{
 							mensaje = mensaje.substr(bs + 1, bs);
-							statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+							statusSend = socket->send(mensaje.c_str(), mensaje.length(), bs);
 						}
 						mensaje = ">";
 					}
@@ -319,7 +356,7 @@ int NonBlocking()
 			char buffer[2000];
 			size_t bytesReceived;
 
-			sf::Socket::Status statusReceive = socket.receive(buffer, 2000, bytesReceived);
+			sf::Socket::Status statusReceive = socket->receive(buffer, 2000, bytesReceived);
 			if (statusReceive == sf::Socket::NotReady) {
 				break;
 			}
@@ -348,12 +385,12 @@ int NonBlocking()
 		window.display();
 		window.clear();
 	}
-	socket.disconnect();
+	socket->disconnect();
 }
 
-int SocketSelector() 
+int SocketSelector(sf::TcpSocket* socket, sf::SocketSelector* ss) 
 {
-	std::cout << "¿Seras servidor (s) o cliente (c)? ... ";
+	/*std::cout << "¿Seras servidor (s) o cliente (c)? ... ";
 	char c;
 	std::cin >> c;
 	sf::TcpSocket socket;
@@ -378,15 +415,24 @@ int SocketSelector()
 	else
 	{
 		exit(0);
-	}
-	std::string texto = "Conexion con ... " + (socket.getRemoteAddress()).toString() + ":" + std::to_string(socket.getRemotePort()) + "\n";
+	}*/
+
+	
+	std::vector<sf::TcpSocket*> aSocket;
+	aSocket.push_back(socket);
+
+
+	std::string texto = "Conexion con ... " + (socket->getRemoteAddress()).toString() + ":" + std::to_string(socket->getRemotePort()) + "\n";
 	std::cout << texto;
 
 	std::vector<std::string> aMensajes;
 
 	//RECEIVE
-	MyFunctor fnctor(&socket, &aMensajes);
-	std::thread t(fnctor);
+	//MyFunctor fnctor(socket, &aMensajes);
+	//std::thread t(fnctor);
+	//std::vector<std::string>*aMensajes, sf::SocketSelector* ss, std::vector<sf::TcpSocket*> aSocket
+	MyFunctorSS ss_functor(&aMensajes, ss, aSocket);
+	std::thread t(ss_functor);
 
 	sf::Vector2i screenDimensions(800, 600);
 
@@ -439,7 +485,7 @@ int SocketSelector()
 					{
 						mensaje = "Chat finalizado";
 						std::cout << mensaje << "\n";
-						sf::Socket::Status status = socket.send(mensaje.c_str(), mensaje.length());
+						sf::Socket::Status status = socket->send(mensaje.c_str(), mensaje.length());
 						if (status != sf::Socket::Status::Done) {
 							std::cout << "ERROR";
 						}
@@ -447,12 +493,12 @@ int SocketSelector()
 						window.display();
 						window.clear();
 						window.close();
-						socket.disconnect();
+						socket->disconnect();
 					}
 					else {
 						//SEND
 						std::cout << mensaje << "\n";
-						sf::Socket::Status status = socket.send(mensaje.c_str(), mensaje.length());
+						sf::Socket::Status status = socket->send(mensaje.c_str(), mensaje.length());
 						if (status != sf::Socket::Status::Done) {
 							std::cout << "ERROR";
 						}
@@ -470,35 +516,7 @@ int SocketSelector()
 				break;
 			}
 		}
-		//RECEIVE -- thread
-		//fnctor.Reception(&socket, &aMensajes);
-		while (ss.wait()) {
 
-			for (int i = 0; i < aSocket.size(); i++)
-			{
-				if (ss.isReady(*aSocket[i]))
-				{
-
-					char buffer[2000];
-					size_t bytesReceived;
-
-					sf::Socket::Status statusReceive = aSocket[i]->receive(buffer, 2000, bytesReceived);
-					if (statusReceive == sf::Socket::NotReady) {
-						break;
-					}
-					else if (statusReceive == sf::Socket::Done) {
-						buffer[bytesReceived] = '\0';
-						aMensajes.push_back(buffer);
-					}
-					else if (statusReceive == sf::Socket::Disconnected) {
-						return 0;
-					}
-					break;
-				}
-
-			}
-
-		}
 
 		window.draw(separator);
 		for (size_t i = 0; i < aMensajes.size(); i++)
@@ -516,63 +534,75 @@ int SocketSelector()
 		window.display();
 		window.clear();
 	}
-	socket.disconnect();
+	socket->disconnect();
 }
 
 int main()
 {
-	std::cout << "Elige Modo (1) Blocking & Threading, (2) Nonblocking, (3) SocketSelector:\n";
-	std::string mode;
-	std::cin >> mode;
 
-	//ESTABLECER CONEXIÓN
 	std::cout << "¿Seras servidor (s) o cliente (c)? ... ";
 	char c;
 	std::cin >> c;
 	sf::TcpSocket socket;
 	std::string textoAEnviar = "";
+
+	char modeBuffer[1];
+	sf::SocketSelector ss;
+	ss.add(socket);
+	// Hola
 	if (c == 's')
 	{
+		std::cout << "Elige Modo (1) Blocking & Threading, (2) Nonblocking, (3) SocketSelector:\n";
+		std::string mode;
+		std::cin >> mode;
+
 		sf::TcpListener listener;
 		listener.listen(50000);
 		listener.accept(socket);
 		textoAEnviar = "Mensaje desde servidor\n";
 		socket.send(mode.c_str(), mode.length());
+
+
+		if (mode == "1") {
+			BlockingThreading(&socket);
+		}
+		else if (mode == "2") {
+			NonBlocking(&socket);
+		}
+		else if (mode == "3") {
+			SocketSelector(&socket, &ss);
+		}
+		else
+		{
+			std::cout << "Invalid number";
+		}
 	}
 	else if (c == 'c')
 	{
 		socket.connect("localhost", 50000, sf::milliseconds(15.f));
 		textoAEnviar = "Mensaje desde cliente\n";
 
-		char buffer[2000];
+		// Rebre el mode seleccionat per el servidor
 		size_t bytesReceived;
+		socket.receive(modeBuffer, 1, bytesReceived);
+		//modeBuffer[bytesReceived] = '\n';
+		std::cout << modeBuffer;
 
-		socket.receive(buffer, 2000, bytesReceived);
-
+		if (modeBuffer[0] == '1') {
+			BlockingThreading(&socket);
+		}
+		else if (modeBuffer[0] == '2') {
+			NonBlocking(&socket);
+		}
+		else if (modeBuffer[0] == '3') {
+			SocketSelector(&socket, &ss);
+		}
 	}
 	else
 	{
 		exit(0);
 	}
-	std::string texto = "Conexion con ... " + (socket.getRemoteAddress()).toString() + ":" + std::to_string(socket.getRemotePort()) + "\n";
-	std::cout << texto;
 
-	std::vector<std::string> aMensajes;
-
-	/*switch (mode)
-	{
-	case 1:
-		BlockingThreading();
-		break;
-	case 2:
-		NonBlocking();
-		break;
-	case 3:
-		SocketSelector();
-	default:
-		break;
-	}*/
-	
 }
 
 /*
@@ -618,4 +648,20 @@ system("pause");
 
 return 0;
 
+}*/
+
+/*
+void Reception(sf::TcpSocket*socket, std::vector<std::string>*aMensajes) {
+char buffer[100];
+size_t bytesReceived;
+//sf::Socket::Status status = socket.receive;
+int a = 1;
+while (a != 0) {
+socket->receive(buffer, 100, bytesReceived);
+aMensajes->push_back(buffer);
+if (aMensajes->size() > 25)
+{
+aMensajes->erase(aMensajes->begin(), aMensajes->begin() + 1);
+}
+}
 }*/
