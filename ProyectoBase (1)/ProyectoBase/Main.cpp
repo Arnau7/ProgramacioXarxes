@@ -53,12 +53,12 @@ public:
 	void operator()() {
 		while (true) {
 			if (ss->wait()) {
-				//std::cout << "Tenc una peticio\n";
+				std::cout << "Tenc una peticio\n";
 				for (int i = 0; i < aSocket.size(); i++)
 				{
 					if (ss->isReady(*aSocket[i]))
 					{
-						//std::cout << "He trobat el socket, es el " << i << "\n";
+						std::cout << "He trobat el socket, es el " << i << "\n";
 						char buffer[2000];
 						size_t bytesReceived;
 
@@ -71,6 +71,7 @@ public:
 							aMensajes->push_back(buffer);
 						}
 						else if (statusReceive == sf::Socket::Disconnected) {
+							ss->remove(*aSocket[i]);
 							break;
 						}
 						break;
@@ -81,7 +82,6 @@ public:
 			}
 		}
 	}
-
 };
 
 int BlockingThreading(sf::TcpSocket* socket) 
@@ -199,6 +199,7 @@ int BlockingThreading(sf::TcpSocket* socket)
 		window.clear();
 	}
 	socket->disconnect();
+	return 0;
 }
 
 int NonBlocking(sf::TcpSocket* socket) 
@@ -459,6 +460,7 @@ int SocketSelector(sf::TcpSocket* socket)
 		window.clear();
 	}
 	socket->disconnect();
+	return 0;
 }
 
 int main()
@@ -520,66 +522,4 @@ int main()
 	{
 		exit(0);
 	}
-
 }
-
-/*
-int main()
-{
-std::cout << "¿Seras servidor (s) o cliente (c)? ... ";
-char c;
-std::cin >> c;
-sf::TcpSocket socket;
-std::string textoAEnviar="";
-if (c == 's')
-{
-sf::TcpListener listener;
-listener.listen(50000);
-listener.accept(socket);
-textoAEnviar = "Mensaje desde servidor\n";
-}
-else if (c == 'c')
-{
-socket.connect("localhost", 50000, sf::milliseconds(15.f));
-textoAEnviar = "Mensaje desde cliente\n";
-
-}
-else
-{
-exit(0);
-}
-std::string texto = "Conexion con ... " + (socket.getRemoteAddress()).toString() + ":" + std::to_string(socket.getRemotePort()) + "\n";
-std::cout << texto;
-
-socket.send(textoAEnviar.c_str(), texto.length());
-
-char buffer[100];
-size_t bytesReceived;
-socket.receive(buffer, 100, bytesReceived);
-
-buffer[bytesReceived] = '\0';
-std::cout << "Mensaje recibido: " << buffer << std::endl;
-
-
-
-system("pause");
-
-return 0;
-
-}*/
-
-/*
-void Reception(sf::TcpSocket*socket, std::vector<std::string>*aMensajes) {
-char buffer[100];
-size_t bytesReceived;
-//sf::Socket::Status status = socket.receive;
-int a = 1;
-while (a != 0) {
-socket->receive(buffer, 100, bytesReceived);
-aMensajes->push_back(buffer);
-if (aMensajes->size() > 25)
-{
-aMensajes->erase(aMensajes->begin(), aMensajes->begin() + 1);
-}
-}
-}*/
