@@ -2,21 +2,79 @@
 #include <SFML\Graphics.hpp>
 #include <string>
 #include <iostream>
+#include <vector>
+#include <thread>
+#include <mutex>
+
+bool messageRecived = false;
+
+class MyFunctorSS
+{
+private:
+	sf::SocketSelector* ss;
+	std::vector<std::string>*aMensajes;
+	std::vector<sf::TcpSocket*>aSocket;
+	int* clientN;
+public:
+	MyFunctorSS(std::vector<std::string>*aMensajes, sf::SocketSelector* ss, std::vector<sf::TcpSocket*> aSocket, int* clientN) {
+		this->ss = ss;
+		this->aMensajes = aMensajes;
+		this->aSocket = aSocket;
+		this->clientN = clientN;
+	}
+	void operator()() {
+		while (true) {
+			if (ss->wait()) {
+				std::cout << "Tenc una peticio\n";
+				for (int i = 0; i < aSocket.size(); i++)
+				{
+					if (ss->isReady(*aSocket[i]))
+					{
+						std::cout << "He trobat el socket, es el " << i << "\n";
+						char buffer[2000];
+						size_t bytesReceived;
+
+						sf::Socket::Status statusReceive = aSocket[i]->receive(buffer, 2000, bytesReceived);
+						if (statusReceive == sf::Socket::NotReady) {
+							break;
+						}
+						else if (statusReceive == sf::Socket::Done) {
+							buffer[bytesReceived] = '\0';
+							aMensajes->push_back(buffer);
+							messageRecived = true;
+							this->clientN = &i;
+						}
+						else if (statusReceive == sf::Socket::Disconnected) {
+							ss->remove(*aSocket[i]);
+							break;
+						}
+						break;
+					}
+
+				}
+
+			}
+		}
+	}
+};
 
 int main()
 {
-
-	std::cout << "Ets el servidor";
-	
-	sf::TcpSocket socket;
-	std::string textoAEnviar = "";
+	//for (int i = 0; i < 1000; i++)	
+	std::cout << "Ets el servidor\n";
 	std::vector<sf::TcpSocket*> aSocket;
+	std::string textoAEnviar = "";
 	sf::SocketSelector ss;
+	sf::TcpSocket socket;
+	int clientN;
 
-		
 	sf::TcpListener listener;
+	sf::Socket::Status status = listener.listen(50000);
+	if (status != sf::Socket::Status::Done) {
+		std::cout << "End";
+	}
+
 	while (aSocket.size() < 4) {
-		sf::Socket::Status status = listener.listen(50000);
 		if (status == sf::Socket::Status::Done) {
 			sf::TcpSocket* tempSocket = new sf::TcpSocket;
 			sf::Socket::Status statusAccept = listener.accept(*tempSocket);
@@ -24,15 +82,38 @@ int main()
 			aSocket.push_back(tempSocket);
 			if (statusAccept != sf::Socket::Status::Done) {
 				std::cout << "Error al acceptar connexió\n";
+				// Borrar tempSocket i tbe al desconectar
 			}
+			else
+				std::cout << "S'ha afegit un client nou amb: "  << tempSocket->getRemoteAddress().toString() << "\n";
 		}
 	}
+	std::cout << "\nJa son 4 clients\n";
 	listener.close();
-	/*
-	std::string texto = "Conexion con ... " + (socket->getRemoteAddress()).toString() + ":" + std::to_string(socket->getRemotePort()) + "\n";
-	std::cout << texto;
-
+	
 	std::vector<std::string> aMensajes;
+
+	MyFunctorSS ss_functor(&aMensajes, &ss, aSocket, &clientN);
+	std::thread t(ss_functor);
+
+
+
+	//SEND
+	/*std::string mensaje = " >";
+	std::size_t bs;
+	std::cout << mensaje << "\n";
+	sf::Socket::Status statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+	while (statusSend == sf::Socket::Status::Partial)
+	{
+		mensaje = mensaje.substr(bs + 1, bs);
+		statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+	}
+	mensaje = ">";
+
+	//std::string texto = "Conexion con ... " + (socket->getRemoteAddress()).toString() + ":" + std::to_string(socket->getRemotePort()) + "\n";
+	//std::cout << texto;
+
+	/*std::vector<std::string> aMensajes;
 
 		MyFunctorSS ss_functor(&aMensajes, &ss, aSocket);
 		std::thread t(ss_functor);
@@ -138,5 +219,5 @@ int main()
 			window.clear();
 		}
 		socket->disconnect();*/
-		return 0;
+		//return 0;
 }
