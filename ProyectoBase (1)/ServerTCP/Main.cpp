@@ -16,7 +16,7 @@ private:
 	std::vector<sf::TcpSocket*>aSocket;
 	int* clientN;
 public:
-	MyFunctorSS(std::vector<std::string>*aMensajes, sf::SocketSelector* ss, std::vector<sf::TcpSocket*> aSocket, int* clientN) {
+	MyFunctorSS(std::vector<std::string>*mensaje, sf::SocketSelector* ss, std::vector<sf::TcpSocket*> aSocket, int* clientN) {
 		this->ss = ss;
 		this->aMensajes = aMensajes;
 		this->aSocket = aSocket;
@@ -67,6 +67,8 @@ int main()
 	sf::SocketSelector ss;
 	sf::TcpSocket socket;
 	int clientN;
+	std::string mensaje;
+	std::size_t bs;
 
 	sf::TcpListener listener;
 	sf::Socket::Status status = listener.listen(50000);
@@ -91,6 +93,56 @@ int main()
 	std::cout << "\nJa son 4 clients\n";
 	listener.close();
 	
+	while (true) {
+		if (ss.wait()) {
+			std::cout << "Tinc una peticio\n";
+			for (int i = 0; i < aSocket.size(); i++)
+			{
+				if (ss.isReady(*aSocket[i]))
+				{
+					std::cout << "He trobat el socket, es el " << i << "\n";
+					char buffer[2000];
+					size_t bytesReceived;
+
+					sf::Socket::Status statusReceive = aSocket[i]->receive(buffer, 2000, bytesReceived);
+					if (statusReceive == sf::Socket::NotReady) {
+						break;
+					}
+					else if (statusReceive == sf::Socket::Done) {
+						buffer[bytesReceived] = '\0';
+						//aMensajes->push_back(buffer);
+						//messageRecived = true;
+						mensaje = buffer;
+						clientN = i;
+						for (int j = 0; j < aSocket.size(); j++) {
+							if (j == clientN) 
+							{	}
+							else 
+							{
+								std::cout << mensaje << "\n";
+								sf::Socket::Status statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+								while (statusSend == sf::Socket::Status::Partial)
+								{
+									mensaje = mensaje.substr(bs + 1, bs);
+									statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+								}
+								mensaje = "";
+							}
+						}
+						
+
+					}
+					else if (statusReceive == sf::Socket::Disconnected) {
+						ss.remove(*aSocket[i]);
+						break;
+					}
+					break;
+				}
+
+			}
+
+		}
+	}
 	std::vector<std::string> aMensajes;
 
 	MyFunctorSS ss_functor(&aMensajes, &ss, aSocket, &clientN);

@@ -7,6 +7,7 @@ int main() {
 	std::cout << "Hola, ets un client\n";
 
 	sf::TcpSocket socket;
+	socket.setBlocking(false);
 	sf::Socket::Status socketStatus = socket.connect("localhost", 50000, sf::milliseconds(15.f));
 	if (socketStatus == sf::Socket::Status::Done) {
 		std::cout << "T'has conectat correctamnet al servidor\n";

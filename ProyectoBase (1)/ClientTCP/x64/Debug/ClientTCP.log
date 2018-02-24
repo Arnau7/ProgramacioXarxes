@@ -1,5 +1,4 @@
 ﻿  Main.cpp
-c:\users\mripoll\documents\github\programacioxarxes\proyectobase (1)\clienttcp\main.cpp(10): warning C4244: 'argument': conversion from 'float' to 'sf::Int32', possible loss of data
-c:\users\mripoll\documents\github\programacioxarxes\proyectobase (1)\clienttcp\main.cpp(129): warning C4244: 'argument': conversion from '::size_t' to 'float', possible loss of data
-  ClientTCP.vcxproj -> C:\Users\mripoll\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Debug\ClientTCP.exe
-  ClientTCP.vcxproj -> C:\Users\mripoll\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Debug\ClientTCP.pdb (Partial PDB)
+d:\arnau\enti\3r\programació de jocs en xarxa\programacioxarxes\proyectobase (1)\clienttcp\main.cpp(11): warning C4244: 'argumento': conversión de 'float' a 'sf::Int32'; posible pérdida de datos
+d:\arnau\enti\3r\programació de jocs en xarxa\programacioxarxes\proyectobase (1)\clienttcp\main.cpp(130): warning C4244: 'argumento': conversión de '::size_t' a 'float'; posible pérdida de datos
+  ClientTCP.vcxproj -> D:\Arnau\ENTI\3r\Programació de jocs en xarxa\ProgramacioXarxes\ProyectoBase (1)\x64\Debug\ClientTCP.exe
