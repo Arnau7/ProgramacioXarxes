@@ -2,6 +2,39 @@
 #include <SFML\Graphics.hpp>
 #include <string>
 #include <iostream>
+#include <mutex>
+
+std::mutex mu;
+
+class MyFunctor
+{
+private:
+	sf::TcpSocket*socket;
+	std::vector<std::string>*aMensajes;
+public:
+	MyFunctor(sf::TcpSocket*socket, std::vector<std::string>*aMensajes) {
+		this->socket = socket;
+		this->aMensajes = aMensajes;
+	}
+	void operator()() {
+		while (true) {
+			char buffer[2000];
+			size_t bytesReceived;
+			sf::Socket::Status status = socket->receive(buffer, 2000, bytesReceived);
+			if (status == sf::Socket::Status::Disconnected) {
+				break;
+			}
+			else if (status == sf::Socket::Status::Done) {
+				buffer[bytesReceived] = '\0';
+				mu.lock();
+				std::cout << "\n Funciona tot! \n" << "He rebut: " << buffer;
+				this->aMensajes->push_back(buffer);
+				mu.unlock();
+			}
+		}
+	}
+
+};
 
 int main() {
 	std::cout << "Client online\n";
@@ -13,8 +46,12 @@ int main() {
 		std::cout << "Connected to server\n";
 	}
 
+
 	//Xat
 	std::vector<std::string> aMensajes;
+
+	MyFunctor fnctor(&socket, &aMensajes);
+	std::thread t(fnctor);
 
 	sf::Vector2i screenDimensions(800, 600);
 
@@ -105,7 +142,7 @@ int main() {
 		}
 		//RECEIVE -- thread
 		//fnctor.Reception(&socket, &aMensajes);
-		while (true) {
+		/*while (true) {
 
 			char buffer[2000];
 			size_t bytesReceived;
@@ -121,7 +158,7 @@ int main() {
 			else if (statusReceive == sf::Socket::Disconnected) {
 				return 0;
 			}
-		}
+		}*/
 
 		window.draw(separator);
 		for (size_t i = 0; i < aMensajes.size(); i++)

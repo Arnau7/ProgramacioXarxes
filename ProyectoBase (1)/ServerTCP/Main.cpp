@@ -8,7 +8,7 @@
 
 bool messageReceived = false;
 
-class MyFunctorSS
+/*class MyFunctorSS
 {
 private:
 	sf::SocketSelector* ss;
@@ -56,7 +56,7 @@ public:
 			}
 		}
 	}
-};
+};*/
 
 int main()
 {
@@ -106,7 +106,7 @@ int main()
 			{
 				if (ss.isReady(*aSocket[i]))
 				{
-					std::cout << "He trobat el socket, es el " << i << "\n";
+					std::cout << "He trobat el socket, es el " << i + 1 << "\n";
 					char buffer[2000];
 					size_t bytesReceived;
 
@@ -115,12 +115,17 @@ int main()
 						break;
 					}
 					else if (statusReceive == sf::Socket::Done) {
+						std::cout << "He rebut correctament\n";
 						buffer[bytesReceived] = '\0';
+						mensaje = buffer;
+						clientN = i;
+						messageReceived = true;
+						//std::cout << mensaje;
+						/*buffer[bytesReceived] = '\0';
 						//aMensajes->push_back(buffer);
 						messageReceived = true;
 						mensaje = buffer;
-						clientN = i;
-						
+						clientN = i;*/
 					}
 					else if (statusReceive == sf::Socket::Disconnected) {
 						ss.remove(*aSocket[i]);
@@ -131,22 +136,21 @@ int main()
 			}
 			if (messageReceived) {
 				for (int j = 0; j < aSocket.size(); j++) {
-					if (j == clientN)
+					if (j != clientN)
 					{
-					}
-					else
-					{
-						//std::cout << mensaje << "\n";
-						sf::Socket::Status statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+						std::cout << " L'envii al client " << j << "\n";
+						sf::Socket::Status statusSend = aSocket[j]->send(mensaje.c_str(), mensaje.length(), bs);
 						while (statusSend == sf::Socket::Status::Partial)
 						{
 							mensaje = mensaje.substr(bs + 1, bs);
-							statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+							statusSend = aSocket[j]->send(mensaje.c_str(), mensaje.length(), bs);
 						}
-						mensaje = "";
+						if (statusSend == sf::Socket::Status::Done)
+							std::cout << "L'he enviat correctament \n";
 					}
 				}
 				messageReceived = false;
+				mensaje = "";
 			}
 		}
 	}
