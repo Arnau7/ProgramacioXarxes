@@ -6,7 +6,7 @@
 #include <thread>
 #include <mutex>
 
-bool messageRecived = false;
+bool messageReceived = false;
 
 class MyFunctorSS
 {
@@ -41,7 +41,7 @@ public:
 						else if (statusReceive == sf::Socket::Done) {
 							buffer[bytesReceived] = '\0';
 							aMensajes->push_back(buffer);
-							messageRecived = true;
+							//messageRecived = true;
 							this->clientN = &i;
 						}
 						else if (statusReceive == sf::Socket::Disconnected) {
@@ -61,7 +61,7 @@ public:
 int main()
 {
 	//for (int i = 0; i < 1000; i++)	
-	std::cout << "Ets el servidor\n";
+	std::cout << "Server online\n";
 	std::vector<sf::TcpSocket*> aSocket;
 	std::string textoAEnviar = "";
 	sf::SocketSelector ss;
@@ -83,15 +83,21 @@ int main()
 			ss.add(*tempSocket);
 			aSocket.push_back(tempSocket);
 			if (statusAccept != sf::Socket::Status::Done) {
-				std::cout << "Error al acceptar connexió\n";
+				std::cout << "Error accepting connection\n";
+				delete tempSocket;
 				// Borrar tempSocket i tbe al desconectar
 			}
 			else
-				std::cout << "S'ha afegit un client nou amb: "  << tempSocket->getRemoteAddress().toString() << "\n";
+				std::cout << "New client: " << tempSocket->getRemoteAddress().toString() << "\n";
 		}
 	}
-	std::cout << "\nJa son 4 clients\n";
+	std::cout << "\n4 Clients online\n";
 	listener.close();
+
+	mensaje = "All players connected\n";
+	for (int i = 0; i < 4; i++) {
+		sf::Socket::Status statusSend = aSocket[i]->send(mensaje.c_str(), mensaje.length());
+	}
 	
 	while (true) {
 		if (ss.wait()) {
@@ -111,26 +117,10 @@ int main()
 					else if (statusReceive == sf::Socket::Done) {
 						buffer[bytesReceived] = '\0';
 						//aMensajes->push_back(buffer);
-						//messageRecived = true;
+						messageReceived = true;
 						mensaje = buffer;
 						clientN = i;
-						for (int j = 0; j < aSocket.size(); j++) {
-							if (j == clientN) 
-							{	}
-							else 
-							{
-								std::cout << mensaje << "\n";
-								sf::Socket::Status statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
-								while (statusSend == sf::Socket::Status::Partial)
-								{
-									mensaje = mensaje.substr(bs + 1, bs);
-									statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
-								}
-								mensaje = "";
-							}
-						}
 						
-
 					}
 					else if (statusReceive == sf::Socket::Disconnected) {
 						ss.remove(*aSocket[i]);
@@ -138,17 +128,32 @@ int main()
 					}
 					break;
 				}
-
 			}
-
+			if (messageReceived) {
+				for (int j = 0; j < aSocket.size(); j++) {
+					if (j == clientN)
+					{
+					}
+					else
+					{
+						//std::cout << mensaje << "\n";
+						sf::Socket::Status statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+						while (statusSend == sf::Socket::Status::Partial)
+						{
+							mensaje = mensaje.substr(bs + 1, bs);
+							statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
+						}
+						mensaje = "";
+					}
+				}
+				messageReceived = false;
+			}
 		}
 	}
-	std::vector<std::string> aMensajes;
+	//std::vector<std::string> aMensajes;
 
-	MyFunctorSS ss_functor(&aMensajes, &ss, aSocket, &clientN);
-	std::thread t(ss_functor);
-
-
+	//MyFunctorSS ss_functor(&aMensajes, &ss, aSocket, &clientN);
+	//std::thread t(ss_functor);
 
 	//SEND
 	/*std::string mensaje = " >";
