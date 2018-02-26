@@ -87,8 +87,13 @@ int main()
 				delete tempSocket;
 				// Borrar tempSocket i tbe al desconectar
 			}
-			else
+			else {
 				std::cout << "New client: " << tempSocket->getRemoteAddress().toString() << "\n";
+				mensaje = "New client online";
+				for (int i = 0; i < aSocket.size() - 1; i++) {
+					aSocket[i]->send(mensaje.c_str(), mensaje.length());
+				}
+			}
 		}
 	}
 	std::cout << "\n4 Clients online\n";
@@ -96,17 +101,17 @@ int main()
 
 	mensaje = "All players connected\n";
 	for (int i = 0; i < 4; i++) {
-		sf::Socket::Status statusSend = aSocket[i]->send(mensaje.c_str(), mensaje.length());
+		aSocket[i]->send(mensaje.c_str(), mensaje.length());
 	}
 	
 	while (true) {
 		if (ss.wait()) {
-			std::cout << "Tinc una peticio\n";
+			//std::cout << "Tinc una peticio\n";
 			for (int i = 0; i < aSocket.size(); i++)
 			{
 				if (ss.isReady(*aSocket[i]))
 				{
-					std::cout << "He trobat el socket, es el " << i + 1 << "\n";
+					//std::cout << "He trobat el socket, es el " << i + 1 << "\n";
 					char buffer[2000];
 					size_t bytesReceived;
 
@@ -129,6 +134,12 @@ int main()
 					}
 					else if (statusReceive == sf::Socket::Disconnected) {
 						ss.remove(*aSocket[i]);
+						// Eliminar del aSocket
+						mensaje = "S'ha desconectat el client: " + std::to_string(i);
+						aSocket.erase(aSocket.begin() + (i));
+						for (int j = 0; j < aSocket.size(); j++) {
+							aSocket[j]->send(mensaje.c_str(), mensaje.length());
+						}
 						break;
 					}
 					break;

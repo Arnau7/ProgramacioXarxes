@@ -1,2 +1,5 @@
-﻿  ClientTCP.vcxproj -> C:\Users\Miquel\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Debug\ClientTCP.exe
+﻿  Main.cpp
+c:\users\miquel\documents\github\programacioxarxes\proyectobase (1)\clienttcp\main.cpp(44): warning C4244: 'argumento': conversión de 'float' a 'sf::Int32'; posible pérdida de datos
+c:\users\miquel\documents\github\programacioxarxes\proyectobase (1)\clienttcp\main.cpp(167): warning C4244: 'argumento': conversión de '::size_t' a 'float'; posible pérdida de datos
+  ClientTCP.vcxproj -> C:\Users\Miquel\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Debug\ClientTCP.exe
   ClientTCP.vcxproj -> C:\Users\Miquel\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Debug\ClientTCP.pdb (Partial PDB)

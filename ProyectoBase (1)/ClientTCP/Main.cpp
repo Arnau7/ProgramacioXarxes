@@ -50,8 +50,8 @@ int main() {
 	//Xat
 	std::vector<std::string> aMensajes;
 
-	MyFunctor fnctor(&socket, &aMensajes);
-	std::thread t(fnctor);
+	//MyFunctor fnctor(&socket, &aMensajes);
+	//std::thread t(fnctor);
 
 	sf::Vector2i screenDimensions(800, 600);
 
@@ -142,7 +142,7 @@ int main() {
 		}
 		//RECEIVE -- thread
 		//fnctor.Reception(&socket, &aMensajes);
-		/*while (true) {
+		while (true) {
 
 			char buffer[2000];
 			size_t bytesReceived;
@@ -158,7 +158,7 @@ int main() {
 			else if (statusReceive == sf::Socket::Disconnected) {
 				return 0;
 			}
-		}*/
+		}
 
 		window.draw(separator);
 		for (size_t i = 0; i < aMensajes.size(); i++)
