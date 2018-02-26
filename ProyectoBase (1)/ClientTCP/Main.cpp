@@ -4,37 +4,6 @@
 #include <iostream>
 #include <mutex>
 
-std::mutex mu;
-
-class MyFunctor
-{
-private:
-	sf::TcpSocket*socket;
-	std::vector<std::string>*aMensajes;
-public:
-	MyFunctor(sf::TcpSocket*socket, std::vector<std::string>*aMensajes) {
-		this->socket = socket;
-		this->aMensajes = aMensajes;
-	}
-	void operator()() {
-		while (true) {
-			char buffer[2000];
-			size_t bytesReceived;
-			sf::Socket::Status status = socket->receive(buffer, 2000, bytesReceived);
-			if (status == sf::Socket::Status::Disconnected) {
-				break;
-			}
-			else if (status == sf::Socket::Status::Done) {
-				buffer[bytesReceived] = '\0';
-				mu.lock();
-				std::cout << "\n Funciona tot! \n" << "He rebut: " << buffer;
-				this->aMensajes->push_back(buffer);
-				mu.unlock();
-			}
-		}
-	}
-
-};
 
 int main() {
 	std::cout << "Client online\n";
@@ -46,12 +15,10 @@ int main() {
 		std::cout << "Connected to server\n";
 	}
 
+	std::mutex mu;
 
 	//Xat
 	std::vector<std::string> aMensajes;
-
-	//MyFunctor fnctor(&socket, &aMensajes);
-	//std::thread t(fnctor);
 
 	sf::Vector2i screenDimensions(800, 600);
 
@@ -103,7 +70,7 @@ int main() {
 					if (mensaje == ">exit" || mensaje == "exit")
 					{
 						std::size_t bs;
-						mensaje = "Chat finalizado";
+						mensaje = "Chat ended";
 						std::cout << mensaje << "\n";
 						sf::Socket::Status statusSend = socket.send(mensaje.c_str(), mensaje.length(), bs);
 						while (statusSend == sf::Socket::Status::Partial)
@@ -140,8 +107,6 @@ int main() {
 			}
 
 		}
-		//RECEIVE -- thread
-		//fnctor.Reception(&socket, &aMensajes);
 		while (true) {
 
 			char buffer[2000];
@@ -177,5 +142,4 @@ int main() {
 		window.clear();
 	}
 	socket.disconnect();	
-	//return 0;
 }
