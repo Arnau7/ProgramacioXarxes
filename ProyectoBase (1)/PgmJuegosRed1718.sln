@@ -3,11 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProyectoBase", "ProyectoBase\ProyectoBase.vcxproj", "{6A1B6770-E74D-44A0-87B1-8ECCF3246020}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T1ProyectoBase", "ProyectoBase\ProyectoBase.vcxproj", "{6A1B6770-E74D-44A0-87B1-8ECCF3246020}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientTCP", "ClientTCP\ClientTCP.vcxproj", "{95604233-1C0A-4844-821A-CEBCB3C3E66C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T2ClientTCP", "ClientTCP\ClientTCP.vcxproj", "{95604233-1C0A-4844-821A-CEBCB3C3E66C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerTCP", "ServerTCP\ServerTCP.vcxproj", "{23886216-7CDE-46BC-9D77-FE9465690929}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T2ServerTCP", "ServerTCP\ServerTCP.vcxproj", "{23886216-7CDE-46BC-9D77-FE9465690929}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T3BootstrapServer", "BootstrapServer\BootstrapServer.vcxproj", "{C430349B-D5D2-4D2B-B716-D91273C64A26}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T3Peer", "Peer\Peer.vcxproj", "{83F66FD9-AEF5-4C9C-B5F1-5B6269228FFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +45,22 @@ Global
 		{23886216-7CDE-46BC-9D77-FE9465690929}.Release|x64.Build.0 = Release|x64
 		{23886216-7CDE-46BC-9D77-FE9465690929}.Release|x86.ActiveCfg = Release|Win32
 		{23886216-7CDE-46BC-9D77-FE9465690929}.Release|x86.Build.0 = Release|Win32
+		{C430349B-D5D2-4D2B-B716-D91273C64A26}.Debug|x64.ActiveCfg = Debug|x64
+		{C430349B-D5D2-4D2B-B716-D91273C64A26}.Debug|x64.Build.0 = Debug|x64
+		{C430349B-D5D2-4D2B-B716-D91273C64A26}.Debug|x86.ActiveCfg = Debug|Win32
+		{C430349B-D5D2-4D2B-B716-D91273C64A26}.Debug|x86.Build.0 = Debug|Win32
+		{C430349B-D5D2-4D2B-B716-D91273C64A26}.Release|x64.ActiveCfg = Release|x64
+		{C430349B-D5D2-4D2B-B716-D91273C64A26}.Release|x64.Build.0 = Release|x64
+		{C430349B-D5D2-4D2B-B716-D91273C64A26}.Release|x86.ActiveCfg = Release|Win32
+		{C430349B-D5D2-4D2B-B716-D91273C64A26}.Release|x86.Build.0 = Release|Win32
+		{83F66FD9-AEF5-4C9C-B5F1-5B6269228FFF}.Debug|x64.ActiveCfg = Debug|x64
+		{83F66FD9-AEF5-4C9C-B5F1-5B6269228FFF}.Debug|x64.Build.0 = Debug|x64
+		{83F66FD9-AEF5-4C9C-B5F1-5B6269228FFF}.Debug|x86.ActiveCfg = Debug|Win32
+		{83F66FD9-AEF5-4C9C-B5F1-5B6269228FFF}.Debug|x86.Build.0 = Debug|Win32
+		{83F66FD9-AEF5-4C9C-B5F1-5B6269228FFF}.Release|x64.ActiveCfg = Release|x64
+		{83F66FD9-AEF5-4C9C-B5F1-5B6269228FFF}.Release|x64.Build.0 = Release|x64
+		{83F66FD9-AEF5-4C9C-B5F1-5B6269228FFF}.Release|x86.ActiveCfg = Release|Win32
+		{83F66FD9-AEF5-4C9C-B5F1-5B6269228FFF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
