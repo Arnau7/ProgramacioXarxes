@@ -27,12 +27,14 @@ void main()
 		if (statusAccept == Socket::Status::Done) 
 		{
 			direction d(sock.getRemoteAddress().toString(), sock.getRemotePort());
-			aPeers.push_back(d);
+			
 			//Construir 1 mensaje
 			Packet packet;
 			packet << d.ip << d.port;
 			sock.send(packet);
 			sock.disconnect();
+			cout << "HELLO PEER\n";
+			aPeers.push_back(d);
 		}
 	}
 	listener.close();
