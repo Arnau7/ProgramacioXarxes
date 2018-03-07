@@ -15,25 +15,28 @@ struct direction
 };
 
 vector<direction> aPeers;
-
 void main()
 {
+	int maxPeers = 4;
+	int conectedPeers = 0;
+	Packet packet;
 	TcpListener listener;
 	listener.listen(50000);
-	for (int i = 0; i < 4; i++) 
+	for (int i = 0; i < maxPeers; i++) 
 	{
+		string str = to_string(maxPeers) + '+' + to_string(conectedPeers) + '-';
 		TcpSocket sock;
 		Socket::Status statusAccept = listener.accept(sock);
 		if (statusAccept == Socket::Status::Done) 
 		{
+			for (int i = 0; i < conectedPeers; i++) {
+				str += aPeers[i].ip + '.' + to_string(aPeers[i].port) + '#';
+			}
 			direction d(sock.getRemoteAddress().toString(), sock.getRemotePort());
-			
-			//Construir 1 mensaje
-			Packet packet;
 			packet << d.ip << d.port;
+			cout << "Direction added to the package, it's length now is: " << packet.getDataSize() << "\n";
 			sock.send(packet);
 			sock.disconnect();
-			cout << "HELLO PEER\n";
 			aPeers.push_back(d);
 		}
 	}
