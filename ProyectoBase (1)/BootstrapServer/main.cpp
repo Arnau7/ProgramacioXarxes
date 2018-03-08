@@ -7,37 +7,41 @@
 using namespace std;
 using namespace sf;
 
-struct direction
+struct Direction
 {
 	string ip;
 	unsigned short port;
-	direction(string _ip, unsigned short _port) : ip(_ip), port(_port){}
+	Direction(string _ip, unsigned short _port) : ip(_ip), port(_port){}
+	Direction(){}
 };
 
-vector<direction> aPeers;
+vector<Direction> aPeers;
 void main()
 {
 	int maxPeers = 4;
 	int conectedPeers = 0;
-	Packet packet;
 	TcpListener listener;
 	listener.listen(50000);
-	for (int i = 0; i < maxPeers; i++) 
+	for (int i = 0; i < maxPeers; i++)
 	{
-		string str = to_string(maxPeers) + '+' + to_string(conectedPeers) + '-';
 		TcpSocket sock;
 		Socket::Status statusAccept = listener.accept(sock);
-		if (statusAccept == Socket::Status::Done) 
+		string str = to_string(maxPeers) + '+' + to_string(conectedPeers) + '-';
+		if (statusAccept == Socket::Status::Done)
 		{
 			for (int i = 0; i < conectedPeers; i++) {
-				str += aPeers[i].ip + '.' + to_string(aPeers[i].port) + '#';
+				str += aPeers[i].ip + '_' + to_string(aPeers[i].port) + 'H';
+				cout << "Client afegit a l'string \n";
 			}
-			direction d(sock.getRemoteAddress().toString(), sock.getRemotePort());
-			packet << d.ip << d.port;
-			cout << "Direction added to the package, it's length now is: " << packet.getDataSize() << "\n";
+
+			Direction d(sock.getRemoteAddress().toString(), sock.getRemotePort());
+			Packet packet;
+			packet << str;
 			sock.send(packet);
+			cout << str << "\n";
 			sock.disconnect();
 			aPeers.push_back(d);
+			conectedPeers++;
 		}
 	}
 	listener.close();

@@ -1,5 +1,1 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(387,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (ClientTCP.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  Skipping... (no relevant changes detected)
-  Main.cpp
-  ClientTCP.vcxproj -> C:\Users\mripoll\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Debug\T2ClientTCP.exe
-  ClientTCP.vcxproj -> C:\Users\mripoll\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Debug\T2ClientTCP.pdb (Partial PDB)
+﻿

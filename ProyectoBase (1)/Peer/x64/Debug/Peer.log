@@ -1,5 +1,1 @@
-﻿  main.cpp
-c:\users\mripoll\documents\github\programacioxarxes\proyectobase (1)\peer\main.cpp(48): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-  LINK : C:\Users\mripoll\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Debug\T4Peer.exe not found or not built by the last incremental link; performing full link
-  Peer.vcxproj -> C:\Users\mripoll\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Debug\T4Peer.exe
-  Peer.vcxproj -> C:\Users\mripoll\Documents\GitHub\ProgramacioXarxes\ProyectoBase (1)\x64\Debug\T4Peer.pdb (Partial PDB)
+﻿
